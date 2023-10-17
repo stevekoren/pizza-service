@@ -1,0 +1,36 @@
+appDomain: ""
+replicaCount: 2
+istioNamespace: "istio-system"
+istioGateway: "pizza-gateway"
+image:
+  repository: stevekoren/pizza-service
+  pullPolicy: IfNotPresent
+  tag: latest
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+app:
+  replicas: 1
+  minReplica: 1
+  maxReplica: 4
+  image: hiredscore/pizza:latest
+imageCredentials:
+  registry: docker.io
+  username:
+  password:
+service:
+  name: pizza-service
+  type: LoadBalancer  # Use LoadBalancer for external access, or ClusterIP for internal-only access
+ingress:
+  enabled: false
+  host: your-api-domain.com  # Replace with your domain if using Ingress
+persistence:
+  enabled: false
+secret:
+  enabled: false
+  secretKey: base64-encoded-secret-key
+  databaseURL: base64-encoded-database-url
