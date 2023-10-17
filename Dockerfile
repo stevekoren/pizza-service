@@ -1,26 +1,35 @@
-FROM python:3.11.4-slim-buster  as final
+# Use a smaller base image
+FROM python:3.11-slim as builder
 
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-LABEL name="pizza-service" \
-      vendor="hiredscore" \
-      version="0.1" \
-      release="0.1" \
-      summary="pizza service" \
-      description="sample pizza service"
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV APP_NAME pizza_service
 ENV WORKDIR /app
-
 WORKDIR ${WORKDIR}
-COPY . ${WORKDIR}
 
-RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
+# Copy just the requirements file
+COPY requirements.txt .
 
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+# Build the final image
+FROM python:3.11-slim as final
+
+ENV WORKDIR /app
+WORKDIR ${WORKDIR}
+
+# Copy application code from the builder stage
+COPY --from=builder ${WORKDIR} ${WORKDIR}
+
+# Create a non-root user
 RUN groupadd -g 1001 appuser && useradd -r -u 1001 -g appuser appuser
-RUN chown -R appuser:appuser /app
+
+# Change ownership of the application directory
+RUN chown -R appuser:appuser ${WORKDIR}
+
 USER appuser
 
 EXPOSE 8080
+
+# Define a HEALTHCHECK
+HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
