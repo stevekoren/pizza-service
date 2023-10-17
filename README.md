@@ -19,14 +19,20 @@ Start the server:
 uvicorn main:app
 API endpoints:
 
-/health (GET): Returns a simple health check.
-curl http://localhost:8000/health
-/order (POST): Creates a new pizza order.
+```/health (GET)```: Returns a simple health check.
+
+```curl http://localhost:8000/health```
+
+```/order (POST)```: Creates a new pizza order.
+
+```
 curl -X POST http://localhost:8000/order -H "Content-Type: application/json" -d '{
     "pizza-type": "margherita",
     "size": "family",
     "amount": 2
 }'
+```
+
 This is a simple Pizza Order API built with FastAPI and Python. It allows you to place pizza orders and retrieve the health status of the service.
 
 ## Getting Started
